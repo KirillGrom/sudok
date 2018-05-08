@@ -315,36 +315,36 @@ document.addEventListener("DOMContentLoaded", function (event) {
             var y = event.offsetY == undefined ? event.layerY : event.offsetY;
 
             inMouseCell(x, y);
-            if (checkSudok(arrArea)) {
-                alert('Молодец')
-            }
+            // if (checkSudok(arrArea)) {
+            //     alert('Молодец')
+            // }
 
         });
     };
 
-
-    function checkSudok(arrArea) {
-        for (var i in arrArea) {
-
-            for (var j in arrArea[i].arryStrings) {
-
-                for (var a in arrArea[i].arryStrings[j].arrCell) {
-
-                    var cell = arrArea[i].arryStrings[j].arrCell[a];
-
-                    if (!cell.countCell === cell.countUser) {
-                        return false
-                    }
-                    else {
-                        return true
-                    }
-
-
-                }
-            }
-        }
-
-    };
+    //
+    // function checkSudok(arrArea) {
+    //     for (var i in arrArea) {
+    //
+    //         for (var j in arrArea[i].arryStrings) {
+    //
+    //             for (var a in arrArea[i].arryStrings[j].arrCell) {
+    //
+    //                 var cell = arrArea[i].arryStrings[j].arrCell[a];
+    //
+    //                 if (!cell.countCell === cell.countUser) {
+    //                     return false
+    //                 }
+    //                 else {
+    //                     return true
+    //                 }
+    //
+    //
+    //             }
+    //         }
+    //     }
+    //
+    // };
 
     generateCanvas();
 });
