@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
         //Создаие канваса
         var canvas = document.querySelector(".sudok");
         var ctx = canvas.getContext('2d');
+        canvas.width = ctx.canvas.clientWidth;
+        canvas.height = ctx.canvas.clientHeight;
+        // ctx.viewport(0,0,ctx.canvas.width,ctx.canvas.height);
         var width = canvas.width;
         var height = canvas.height;
         var arrArea = [];
@@ -59,9 +62,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
             }
         };
 
-        var Cell = function Cell(corX, corY, width, height, number, hide) {
+        var Cell = function Cell(corX, corY, width, height, countCell, hide) {
             // коструктор ячейки
-            this.cellCorX = corX, this.cellCorY = corY, this.cellWidth = width, this.cellHeight = height, this.number = number, this.hide = hide;
+            this.cellCorX = corX, this.cellCorY = corY, this.cellWidth = width, this.cellHeight = height, this.countCell = countCell, this.hide = hide;
         };
         Cell.prototype = {
             draw: function draw() {
@@ -70,12 +73,20 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 ctx.strokeRect(this.cellCorX, this.cellCorY, this.cellWidth, this.cellHeight);
             },
 
-            numberDraw: function numberDraw() {
-                //отрисоквка текста внутри ячейки 
-                ctx.font = "15px Arial";
-                ctx.fillText(this.number, this.cellCorX + 14, this.cellCorY + 14);
+            numberDraw: function numberDraw(countUser ) {
+                //отрисоквка текста внутри ячейки
+
+                ctx.font = "25px Arial";
+                if(countUser ===undefined){
+
+                    ctx.fillText(this.countCell, this.cellCorX + 10, this.cellCorY + 25);
+                }
+                else {
+                    ctx.fillText(this.countUser, this.cellCorX + 10, this.cellCorY + 25);
+                }
+
             },
-            hideCell: function hideCell() {}
+
         };
 
         var objectСreation = function objectСreation(arr, obj, cordinX, width, height, col) {
@@ -251,14 +262,34 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
         function creatComb(arrArea) {
             //создаем комбинацию 
-            // randomArea(arrArea);
-            // randomString(arrArea);
-            // hideCell(arrArea);
+            randomArea(arrArea);
+            randomString(arrArea);
+            hideCell(arrArea);
             drawSudok(arrArea);
         }
 
         creatComb(arrArea);
-        var searchCell = function searchCell(cursorX, cursorY) {
+        var changeNumber  = function (cell) {
+            var count;
+            if (cell.countUser == undefined || cell.countUser  ===9 ){
+                count=  cell.countUser = 1;
+                cell.draw()
+                cell.numberDraw(count);
+
+            }
+            else if( cell.countUser < 9)  {
+                 count = cell.countUser += 1;
+                cell.draw()
+                 cell.numberDraw(count);
+
+            }
+            else {
+
+            }
+
+        }
+
+        var inMouseCell = function searchCell(cursorX, cursorY) {
             for (var i in arrArea) {
 
                 for (var j in arrArea[i].arryStrings) {
@@ -266,9 +297,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
                     for (var a in arrArea[i].arryStrings[j].arrCell) {
 
                         var cell = arrArea[i].arryStrings[j].arrCell[a];
-                        if (cursorX >= cell.cellCorX && cursorX <= cell.cellCorX + cell.cellWidth) {
-                            if (cursorY > cell.cellCorY && cursorY < cell.cellCorY + cell.cellWidth) {
-                                return console.log(cell.cellCorY + cell.cellWidth);
+                        if (cursorX > cell.cellCorX && cursorX < cell.cellCorX + cell.cellWidth) {
+                            if (cursorY > cell.cellCorY && cursorY < cell.cellCorY + cell.cellHeight) {
+                                if(cell.hide){
+                                    changeNumber(cell)
+                                    console.log(cell)
+                                }
                             }
                         }
                     }
@@ -279,10 +313,37 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
             var x = event.offsetX == undefined ? event.layerX : event.offsetX;
             var y = event.offsetY == undefined ? event.layerY : event.offsetY;
-            console.log(x, y);
 
-            searchCell(x, y);
+            inMouseCell(x, y);
+            if (checkSudok(arrArea)) {
+                alert('Молодец')
+            }
+
         });
+    };
+
+
+    function checkSudok(arrArea) {
+        for (var i in arrArea) {
+
+            for (var j in arrArea[i].arryStrings) {
+
+                for (var a in arrArea[i].arryStrings[j].arrCell) {
+
+                    var cell = arrArea[i].arryStrings[j].arrCell[a];
+
+                    if (!cell.countCell === cell.countUser) {
+                        return false
+                    }
+                    else {
+                        return true
+                    }
+
+
+                }
+            }
+        }
+
     };
 
     generateCanvas();
