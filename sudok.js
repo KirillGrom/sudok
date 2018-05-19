@@ -7,22 +7,31 @@ document.addEventListener("DOMContentLoaded", function (event) {
         //Создаие канваса
         var canvas = document.querySelector(".sudok");
         var ctx = canvas.getContext('2d');
-        canvas.width = ctx.canvas.clientWidth;
-        canvas.height = ctx.canvas.clientHeight;
+        var width = ctx.canvas.clientWidth;
+        var height = ctx.canvas.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
         // ctx.viewport(0,0,ctx.canvas.width,ctx.canvas.height);
-        var width = canvas.width;
-        var height = canvas.height;
         var arrArea = [];
+
         var backGrid = function backGrid(width, height) {
             //отрисовка фона 
             for (var i = 0; i < 3; i++) {
                 for (var j = 0; j < 3; j++) {
                     // ctx.strokeStyle = "#FF0000"
-                    ctx.strokeRect(j * 100, i * height / 3, width, height / 3);
+                    // ctx.strokeRect(j * 100, i * height / 3, width, height / 3);
+                    ctx.beginPath();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "black";
+                    ctx.moveTo(j * 100, i * height / 3);
+                    ctx.lineTo(j * 100 + width, i * height / 3);
+                    ctx.lineTo(j * 100 + width, i * height / 3 + height / 3);
+                    ctx.lineTo(j * 100, i * height / 3 + height / 3);
+                    ctx.lineTo(j * 100, i * height / 3);
+                    ctx.stroke();
                 }
             }
         };
-        backGrid(width, height);
 
         var drawSudok = function drawSudok(objecAree) {
             //отрисовка судоки
@@ -67,25 +76,40 @@ document.addEventListener("DOMContentLoaded", function (event) {
             this.cellCorX = corX, this.cellCorY = corY, this.cellWidth = width, this.cellHeight = height, this.countCell = countCell, this.hide = hide;
         };
         Cell.prototype = {
-            draw: function draw() {
+            draw: function draw(color, bacg) {
                 //отрисовка ячеик
+                // ctx.clearRect(this.cellCorX, this.cellCorY, this.cellWidth, this.cellHeight);
+                // ctx.strokeRect(this.cellCorX, this.cellCorY, this.cellWidth, this.cellHeight);
+                if (color === undefined) {
+                    color = "blue";
+                }
                 ctx.clearRect(this.cellCorX, this.cellCorY, this.cellWidth, this.cellHeight);
-                ctx.strokeRect(this.cellCorX, this.cellCorY, this.cellWidth, this.cellHeight);
+                ctx.beginPath();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = color;
+                ctx.moveTo(this.cellCorX, this.cellCorY);
+                ctx.lineTo(this.cellCorX + this.cellWidth, this.cellCorY);
+                ctx.lineTo(this.cellCorX + this.cellWidth, this.cellCorY + this.cellHeight);
+                ctx.lineTo(this.cellCorX, this.cellCorY + this.cellHeight);
+                ctx.lineTo(this.cellCorX, this.cellCorY);
+                ctx.stroke();
+
+                if (!bacg) {
+                    backGrid(width, height);
+                }
             },
 
-            numberDraw: function numberDraw(countUser ) {
+            numberDraw: function numberDraw(countUser) {
                 //отрисоквка текста внутри ячейки
 
                 ctx.font = "25px Arial";
-                if(countUser ===undefined){
+                if (countUser === undefined) {
 
                     ctx.fillText(this.countCell, this.cellCorX + 10, this.cellCorY + 25);
-                }
-                else {
+                } else {
                     ctx.fillText(this.countUser, this.cellCorX + 10, this.cellCorY + 25);
                 }
-
-            },
+            }
 
         };
 
@@ -102,6 +126,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
             //генерирую строки 
 
             for (var i = 0; i < arry.length; i++) {
+
                 var cordinY = arry[i].corY;
                 for (var j = 0; j < arry.length; j++) {
 
@@ -269,25 +294,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
         }
 
         creatComb(arrArea);
-        var changeNumber  = function (cell) {
+        var changeNumber = function changeNumber(cell) {
             var count;
-            if (cell.countUser == undefined || cell.countUser  ===9 ){
-                count=  cell.countUser = 1;
-                cell.draw()
+            if (cell.countUser == undefined || cell.countUser === 9) {
+                count = cell.countUser = 1;
+                cell.draw("red", true);
                 cell.numberDraw(count);
-
-            }
-            else if( cell.countUser < 9)  {
-                 count = cell.countUser += 1;
-                cell.draw()
-                 cell.numberDraw(count);
-
-            }
-            else {
-
-            }
-
-        }
+            } else if (cell.countUser < 9) {
+                count = cell.countUser += 1;
+                cell.draw("red", true);
+                cell.numberDraw(count);
+            } else {}
+        };
 
         var inMouseCell = function searchCell(cursorX, cursorY) {
             for (var i in arrArea) {
@@ -299,9 +317,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
                         var cell = arrArea[i].arryStrings[j].arrCell[a];
                         if (cursorX > cell.cellCorX && cursorX < cell.cellCorX + cell.cellWidth) {
                             if (cursorY > cell.cellCorY && cursorY < cell.cellCorY + cell.cellHeight) {
-                                if(cell.hide){
-                                    changeNumber(cell)
-                                    console.log(cell)
+                                if (cell.hide) {
+                                    changeNumber(cell);
+                                    console.log(cell);
                                 }
                             }
                         }
@@ -315,36 +333,36 @@ document.addEventListener("DOMContentLoaded", function (event) {
             var y = event.offsetY == undefined ? event.layerY : event.offsetY;
 
             inMouseCell(x, y);
-            // if (checkSudok(arrArea)) {
-            //     alert('Молодец')
-            // }
+        });
 
+        function checkSudok() {
+            //проверка судоку
+            for (var i in arrArea) {
+
+                for (var j in arrArea[i].arryStrings) {
+
+                    for (var a in arrArea[i].arryStrings[j].arrCell) {
+
+                        var cell = arrArea[i].arryStrings[j].arrCell[a];
+                        if (cell.countUser !== undefined) {
+                            if (cell.countCell !== cell.countUser) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        };
+
+        var buttonCheck = document.getElementById('check');
+
+        buttonCheck.addEventListener('click', function () {
+            if (checkSudok()) {
+                alert('Молодец');
+            }
         });
     };
-
-    //
-    // function checkSudok(arrArea) {
-    //     for (var i in arrArea) {
-    //
-    //         for (var j in arrArea[i].arryStrings) {
-    //
-    //             for (var a in arrArea[i].arryStrings[j].arrCell) {
-    //
-    //                 var cell = arrArea[i].arryStrings[j].arrCell[a];
-    //
-    //                 if (!cell.countCell === cell.countUser) {
-    //                     return false
-    //                 }
-    //                 else {
-    //                     return true
-    //                 }
-    //
-    //
-    //             }
-    //         }
-    //     }
-    //
-    // };
 
     generateCanvas();
 });
