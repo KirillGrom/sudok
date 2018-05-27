@@ -418,6 +418,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
                         originalPosition(arrArea);
                         creatComb(arrArea, Number(levelComp[i].value));
+                        colTip = 0;
                     }
                 }
             }
