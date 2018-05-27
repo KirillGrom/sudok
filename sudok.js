@@ -374,17 +374,37 @@ document.addEventListener("DOMContentLoaded", function (event) {
                             if (cell.countCell !== cell.countUser) {
                                 return false;
                             }
-                        } else {
-                            return false;
+                        } else if (cell.countUser !== undefined) {
+                            return true;
                         }
                     }
                 }
             }
-            return true;
+        };
+        var tip = function tip(arrArea) {
+            //
+            for (var i in arrArea) {
+
+                for (var j in arrArea[i].arryStrings) {
+
+                    for (var a in arrArea[i].arryStrings[j].arrCell) {
+
+                        var cell = arrArea[i].arryStrings[j].arrCell[a];
+                        if (cell.countUser !== undefined) {
+                            if (cell.countCell !== cell.countUser) {
+                                cell.draw('#00FF06', true);
+                                cell.numberDraw(cell.countUser);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         };
 
         var buttonCheck = document.getElementById('check');
         var butonNewGame = document.getElementById('newGame');
+        var buttonTip = document.getElementById('tip');
         buttonCheck.addEventListener('click', function () {
             if (checkSudok()) {
                 alert('Молодец');
@@ -400,6 +420,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
                         creatComb(arrArea, Number(levelComp[i].value));
                     }
                 }
+            }
+        });
+        var colTip = 0;
+        buttonTip.addEventListener('click', function () {
+            if (colTip < 3) {
+                tip(arrArea);
+                colTip += 1;
+            } else {
+                alert("Подсказок больше нет ");
             }
         });
     };
