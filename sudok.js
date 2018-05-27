@@ -145,9 +145,13 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
                     if (j === 0) {
                         arry[i].arryStrings[j].strcorY = cordinY;
+
+                        arry[i].arryStrings[j].positionString(arry[i].arryStrings[j].strcorY);
                     } else {
                         cordinY += arry[i].height / 3;
                         arry[i].arryStrings[j].strcorY = cordinY;
+
+                        arry[i].arryStrings[j].positionString(arry[i].arryStrings[j].strcorY);
                     }
                 }
             }
@@ -214,8 +218,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
                         }
                     }
                 }
-
-                // randomString(arrArea)  
             }
         };
 
@@ -226,7 +228,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         };
         var randomArea = function randomArea(areaArry) {
-
             var number = numbRandom(0, 2);
             if (number === 0) {
                 areaArry[0].corY = areaArry[0].corY + areaArry[0].height;
@@ -271,25 +272,51 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 };
             };
         };
+        var originalPosition = function originalPosition(arrArea) {
+            //Восстанавливаю позицию у района
+            for (var i in arrArea) {
+                arrArea[i].corY = i * arrArea[i].height;
+
+                positionStringNew(arrArea);
+            }
+        };
 
         var hideCell = function hideCell(arrArea) {
             var number = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 25;
 
 
-            for (var i = 0; i < number; i++) {
-                var arre = arrArea[numbRandom(0, arrArea.length - 1)];
-                var string = arre.arryStrings[numbRandom(0, arre.arryStrings.length - 1)];
-                var cell = string.arrCell[numbRandom(0, string.arrCell.length - 1)];
-
-                cell.hide = true;
+            if (number <= 50) {
+                for (var i = 0; i < number; i++) {
+                    var arre = arrArea[numbRandom(0, arrArea.length - 1)];
+                    var string = arre.arryStrings[numbRandom(0, arre.arryStrings.length - 1)];
+                    var cell = string.arrCell[numbRandom(0, string.arrCell.length - 1)];
+                    if (cell.hide) {
+                        number += 1;
+                    } else {
+                        cell.hide = true;
+                    }
+                }
             }
         };
+        var visabCell = function visabCell(arrArea) {
+            for (var i in arrArea) {
 
-        function creatComb(arrArea) {
+                for (var j in arrArea[i].arryStrings) {
+
+                    for (var a in arrArea[i].arryStrings[j].arrCell) {
+
+                        arrArea[i].arryStrings[j].arrCell[a].hide = false;
+                    }
+                }
+            }
+            return true;
+        };
+
+        function creatComb(arrArea, levelComp) {
             //создаем комбинацию 
             randomArea(arrArea);
             randomString(arrArea);
-            hideCell(arrArea);
+            hideCell(arrArea, levelComp);
             drawSudok(arrArea);
         }
 
@@ -319,7 +346,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
                             if (cursorY > cell.cellCorY && cursorY < cell.cellCorY + cell.cellHeight) {
                                 if (cell.hide) {
                                     changeNumber(cell);
-                                    console.log(cell);
                                 }
                             }
                         }
@@ -348,6 +374,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
                             if (cell.countCell !== cell.countUser) {
                                 return false;
                             }
+                        } else {
+                            return false;
                         }
                     }
                 }
@@ -356,10 +384,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
         };
 
         var buttonCheck = document.getElementById('check');
-
+        var butonNewGame = document.getElementById('newGame');
         buttonCheck.addEventListener('click', function () {
             if (checkSudok()) {
                 alert('Молодец');
+            }
+        });
+        butonNewGame.addEventListener('click', function () {
+            var levelComp = document.querySelectorAll('[name="level"]');
+            for (var i = 0; i < levelComp.length; i++) {
+                if (levelComp[i].checked) {
+                    if (visabCell(arrArea)) {
+
+                        originalPosition(arrArea);
+                        creatComb(arrArea, Number(levelComp[i].value));
+                    }
+                }
             }
         });
     };

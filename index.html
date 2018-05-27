@@ -11,7 +11,16 @@
         
          
      </canvas>
-     <button id="check" style="display: block; margin: 20px auto auto auto; ">Проверка</button>
+     <div class="button-wrapp"style="display: flex;justify-content: center; margin: 20px 0 0 0; ">
+     <button id="newGame" style="display: block; margin-right: 10px">Новая игра</button>
+     <button id="check" ="display: block;  ">Проверка</button>
+    </div>
+     <div class="level" style="    margin: 10px 0 0 0; text-align: center;">
+        <label >Легкий<input name="level" value ='25' type="radio" checked></label>  
+        <label >Средний<input name="level" value ='35' type="radio"></label>    
+        <label >Сложный<input name="level"  value ='50'type="radio"></label>
+     </div>
+    
      <script src="sudok.js"></script>
 </body>
 </html>
